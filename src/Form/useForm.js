@@ -3,6 +3,7 @@ import {
   useEffect
 } from 'react';
 const useForm = (callback, validate) => {
+
   const [values, setValues] = useState({});
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -11,7 +12,6 @@ const useForm = (callback, validate) => {
     event && event.preventDefault();
     setIsSubmitting(true);
     setErrors(validate(values));
-
   }
 
   const handleChange = (event) => {
@@ -19,10 +19,19 @@ const useForm = (callback, validate) => {
     setValues({
       ...values,
       [event.target.name]: [event.target.value]
-    })
-    console.log('State values in custom hook', values);
-
+    });
+    setErrors(validate(values));
   }
+
+  const handleBlur = (event) => {
+    event.persist();
+    setValues({
+      ...values,
+      [event.target.name]: [event.target.value]
+    });
+    setErrors(validate(values));
+  }
+
   useEffect(() => {
     if (Object.keys(errors).length === 0 && isSubmitting) {
       callback();
@@ -32,6 +41,7 @@ const useForm = (callback, validate) => {
   return {
     handleChange,
     handleSubmit,
+    handleBlur,
     values,
     errors
   }
